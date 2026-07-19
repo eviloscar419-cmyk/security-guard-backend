@@ -1,43 +1,122 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const fileURLToPath = require('url');
-const {dirname, join} = require('path');
-const connectDB = require('./config/db.js');
-const initializeDefaultData =  require('./utils/iniitializeData.js');
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const dotenv = require("dotenv");
+const path = require("path");
 
-const authRoutes = require('./routes/authRoutes.js');
-const toolsRoutes = require('./routes/toolsRoutes.js');
-const userRoutes = require('./routes/userRoutes.js');
-const adminRoutes = require('./routes/adminRoutes.js');
-const chatRoutes =  require('./routes/chatRoutes.js');
+const connectDB = require("./config/db");
+
+// Routes
+const authRoutes = require("./routes/authRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const userRoutes = require("./routes/userRoutes");
+const toolsRoutes = require("./routes/toolsRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+
 
 dotenv.config();
-connectDB();
 
 const app = express();
+
 const PORT = process.env.PORT || 5000;
 
+
+// =======================
+// Middleware
+// =======================
+
+app.use(
+    cors({
+        origin: "*",
+        methods: ["GET","POST","PUT","DELETE"],
+        credentials: true
+    })
+);
+
 app.use(helmet());
-app.use(cors());
+
 app.use(express.json());
-app.use(morgan('dev'));
 
-app.use(express.static(join(__dirname, '../frontend')));
+app.use(express.urlencoded({
+    extended:true
+}));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/tools', toolsRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/chat', chatRoutes);
+app.use(morgan("dev"));
 
-const startServer = async () => {
-  await initializeDefaultData();
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log("Server on fire");
-  });
-};
-startServer();
+
+// =======================
+// MongoDB Connection
+// =======================
+
+connectDB();
+
+
+// =======================
+// Frontend Hosting
+// =======================
+
+app.use(
+    express.static(
+        path.join(__dirname,"../frontend")
+    )
+);
+
+
+// =======================
+// API Routes
+// =======================
+
+app.use("/api/auth",authRoutes);
+
+app.use("/api/admin",adminRoutes);
+
+app.use("/api/user",userRoutes);
+
+app.use("/api/tools",toolsRoutes);
+
+app.use("/api/chat",chatRoutes);
+
+
+// =======================
+// Health Check
+// =======================
+
+app.get("/api/status",(req,res)=>{
+
+    res.json({
+        success:true,
+        message:"Security Guard API Running",
+        time:new Date()
+    });
+
+});
+
+
+// =======================
+// Frontend fallback
+// =======================
+
+app.get("*",(req,res)=>{
+
+    res.sendFile(
+        path.join(
+            __dirname,
+            "../frontend/index.html"
+        )
+    );
+
+});
+
+
+// =======================
+// Start Server
+// =======================
+
+app.listen(PORT,()=>{
+
+    console.log(
+        `🚀 Security Guard running on port ${PORT}`
+    );
+
+});
