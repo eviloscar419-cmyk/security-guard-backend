@@ -52,7 +52,7 @@ const updateUser = async (req, res) => {
     delete userWithoutPassword.password;
     res.json({ success: true, user: userWithoutPassword });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Error'});
   }
 };
 
