@@ -172,6 +172,7 @@ const resetStats = async (req, res) => {
   }
 };
 module.exports = {
+  getAdminStats,
   getActivityLogs,
   deleteActivityLog,
   clearActivityLogs,
