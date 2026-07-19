@@ -5,7 +5,7 @@ const PasswordStat = require('../models/PasswordStat.js');
 const ScanHistory = require('../models/ScanHistory.js');
 const Stats = require('../models/Stats.js');
 const ActivityLog = require('../models/ActivityLog.js');
-
+const User = require('../models/User.js');
 const dnsLookup = promisify(dns.lookup);
 
 const analyzePassword = async (req, res) => {
