@@ -4,6 +4,33 @@ const ActivityLog = require('../models/ActivityLog.js');
 const PhishingReport = require('../models/PhishingReport.js');
 const PasswordStat = require('../models/PasswordStat.js');
 
+const getAdminStats = async (req, res) => {
+  try {
+    const stats = await Stats.findOne();
+    if (!stats) return res.status(404).json({ success: false, message: 'Stats not found' });
+    
+    res.json({
+      totalLoginAttempts: stats.loginAttempts,
+      totalSuccessfulLogins: stats.successfulLogins,
+      totalFailedLogins: stats.failedLogins,
+      totalUrlsScanned: stats.urlsScanned,
+      totalThreatsBlocked: stats.dangerousUrls,
+      totalPasswordsAnalyzed: stats.passwordsAnalyzed,
+      // Backward compatibility for frontend
+      systemStatus: stats.systemStatus,
+      loginAttempts: stats.loginAttempts,
+      successfulLogins: stats.successfulLogins,
+      failedLogins: stats.failedLogins,
+      urlsScanned: stats.urlsScanned,
+      dangerousUrls: stats.dangerousUrls,
+      passwordsAnalyzed: stats.passwordsAnalyzed
+    });
+  } catch (error) {
+    console.error('getAdminStats error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 const getAllUsers = async (req, res) => {
   try { res.json(await User.find().select('-password')); }
   catch (error) { res.status(500).json({ success: false, message: 'Server error' }); }
