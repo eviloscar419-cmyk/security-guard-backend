@@ -1,34 +1,96 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: [4, 'Password must be at least 4 characters']
-  },
-  role: {
-    type: String,
-    enum: ['Admin', 'User'],
-    default: 'User'
-  },
-  name: {
-    type: String,
-    required: [true, 'Name is required'],
-    trim: true
-  },
-  profilePicture: {
-    type: String,
-    default: ''
-  }
-}, {
-  timestamps: true
+
+const userSchema = new mongoose.Schema(
+{
+
+    name:
+    {
+        type:String,
+        required:true,
+        trim:true
+    },
+
+
+    email:
+    {
+        type:String,
+        required:true,
+        unique:true,
+        lowercase:true,
+        trim:true
+    },
+
+
+    password:
+    {
+        type:String,
+        required:true,
+        minlength:4
+    },
+
+
+    role:
+    {
+        type:String,
+        enum:[
+            "Admin",
+            "User"
+        ],
+        default:"User"
+    },
+
+
+    profilePicture:
+    {
+        type:String,
+        default:""
+    }
+
+
+},
+{
+    timestamps:true,
+
+    toJSON:
+    {
+        virtuals:true
+    },
+
+    toObject:
+    {
+        virtuals:true
+    }
+
 });
 
-module.exports = mongoose.model('User', userSchema);
+
+
+// Fix MongoDB id problem
+userSchema.virtual("id")
+.get(function(){
+
+    return this._id.toString();
+
+});
+
+
+
+// Hide password automatically
+userSchema.methods.toSafeObject=function(){
+
+    const user=this.toObject();
+
+    delete user.password;
+
+    return user;
+
+};
+
+
+
+module.exports =
+mongoose.model(
+    "User",
+    userSchema
+);
