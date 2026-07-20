@@ -88,7 +88,8 @@ const analyzePassword = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: error.message,
+      stack: error.stack
     });
   }
 };
